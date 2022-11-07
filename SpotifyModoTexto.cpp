@@ -95,7 +95,7 @@ void readMusics(int i);
 void writeMusic(MUSIC music);
 void repWriteMusic();
 MUSIC setMusic();
-void repEditMusic();
+// void repEditMusic();
 void repDeleteMusic();
 MUSIC findMusic(int id, FILE * file);
 
@@ -121,7 +121,7 @@ int main(){
 		else{
 			switch(choice){
 				case 1:
-					menuMusic();
+					menuMusicExecute();
 					break;
 				case 2: 
 					menuArtistExecute();
@@ -185,7 +185,7 @@ void repWriteArtist(){
 }
 
 void readArtists(int i){
-	clearMenuArea();//temp
+	clearMenuArea();
 	
 	ARTIST artist;
 	FILE * file = fopen(artistsFile, "rb");
@@ -489,7 +489,7 @@ void repWriteMusic(){
 }
 
 void readMusics(int i) {
-	clearMenuArea();//temp
+	clearMenuArea();
 	
 	MUSIC music;
 	FILE * file = fopen(musicsFile, "rb");
@@ -708,11 +708,11 @@ void menuMusicExecute(){
 				break;
 			case 3:
 				//TODO:
-				repEditMusic();
+				// repEditMusic();
 				break;
 			case 4:
 				//TODO:
-				repDeleteMusic();
+				// repDeleteMusic();
 				break;
 		}
 	}
@@ -722,6 +722,8 @@ int menuMusic(){
 	char options[][30] = {"Cadastrar Musicas", "Visualizar Musicas", "Alterar musica", "Excluir musica", "Ajuda (F1)", "Voltar"};
 	int choice = 0;
 	
+	clearMenuArea();
+
 	textbackground(8); textcolor(15);
 	
 	gotoxy(41, 1); cout << "Opcoes: ";
@@ -763,7 +765,7 @@ int menuArtist(){
 	char options[][30] = {"Cadastrar artista", "Visualizar artistas", "Alterar artista", "Excluir artista", "Ajuda (F1)", "Voltar"};
 	int choice = 0;
 	
-	clearMenuArea();//temp
+	clearMenuArea();
 
 	textbackground(8); textcolor(15);
 	
