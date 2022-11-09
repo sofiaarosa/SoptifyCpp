@@ -69,6 +69,7 @@ int menuArtist();
 ///registers
 ////general
 bool isValidDate(int day, int month, int year);
+bool checkDeleted();
 
 ////artist
 bool checkArtistId(int id); 
@@ -117,16 +118,23 @@ int main(){
 	while(choice >= 0){
 		choice = mainMenu();
 		
-		if(choice == 5){
-			int msgboxID = MessageBoxA(NULL, "Deseja recuperar dados excluidos antes de sair?","Recuperar dados",MB_ICONEXCLAMATION|MB_YESNO);
-			if(IDYES){
-				choice = 0;
-				repUndeleteArtist();
-			}
-			if(IDNO){
-				choice = -1;
-			}
+		if(choice == 5 || choice < 0){
 			choice = -1;
+
+			if(checkDeleted()){
+				//message box if there is something deleted in file
+				int msgboxID = MessageBoxA(NULL, "Deseja recuperar dados excluidos antes de sair?","Recuperar dados",MB_ICONEXCLAMATION|MB_YESNO);
+				if(msgboxID == IDYES){
+					repUndeleteArtist();
+				}
+				if(msgboxID == IDNO){
+					choice = -1;
+				}
+
+			}
+
+			permanentlyDeleteArtist();
+			permanentlyDeleteMusic();
 		}
 		else{
 			switch(choice){
@@ -141,9 +149,6 @@ int main(){
 		
 		clearMenuArea();
 	}
-
-	permanentlyDeleteArtist();
-	permanentlyDeleteMusic();
 	
 	return 0;
 }
@@ -158,6 +163,23 @@ bool isValidDate(int day, int month, int year) {
 	else if (month == 2 && day > 28) flag = false;
 
 	return flag;
+}
+
+bool checkDeleted(){
+	ARTIST artist;
+	FILE * file = fopen(artistsFile, "rb");
+	if(!file){
+		errorOpenFile();
+		return false;
+	}
+	while(fread(&artist, sizeof(ARTIST), 1, file)){
+		if(artist.deleted == true){
+			fclose(file);
+			return true;
+		}
+	}
+	fclose(file);
+	return false;
 }
 
 ///artists
