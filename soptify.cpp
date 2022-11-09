@@ -452,7 +452,7 @@ ARTIST checkArtistByName(char * name) {
 	int j = 0;
 	ARTIST artist;
 	ARTIST nullARTIST = {-1, "NULL", -1};
-	char filteredArtistName[71], filteredName[71];
+	char filteredArtistName[71], filteredName[71], auxArtistname[71];
 	char *src, *dst;
 
 	for (src = name, dst = filteredName; *src; src++) {
@@ -463,7 +463,8 @@ ARTIST checkArtistByName(char * name) {
 	*dst = '\0';
 
 	while(fread(&artist, sizeof(artist), 1, file)){
-		for (src = artist.name, dst = filteredArtistName; *src; src++) {
+		strcpy(auxArtistname, artist.name);
+		for (src = auxArtistname, dst = filteredArtistName; *src; src++) {
 			*src = tolower(*src);
 			if ('a' <= *src && *src <= 'z' || '0' <= *src && *src <= '9') 
 				*dst++ = *src;
@@ -660,34 +661,51 @@ MUSIC setMusic() {
 
 	//input
 	do {
+		textcolor(15);
 		gotoxy(horizontalCenter + 8, 4); cout << "              ";
 		gotoxy(horizontalCenter + 8, 4); cin >> auxInt;
 		fflush(stdin);
 		if(auxInt <= 0 || auxInt > 10000){
-			textcolor(4); textbackground(8);
-			gotoxy(endSideBar+15,8); cout << "O id da musica deve ser numerico entre 1 e 10000"; 
+			textcolor(4);
+			gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+			gotoxy(endSideBar+15,10); cout << "O id da musica deve ser numerico entre 1 e 10000."; 
+		} else if (!checkMusicId(auxInt)) {
+			textcolor(4);
+			gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+			gotoxy(endSideBar+24,10); cout << "Esse id ja esta sendo utilizado."; 
 		}
 	} while (!checkMusicId(auxInt) || auxInt <= 0 || auxInt > 10000); //check if id already exists
 	music.id = auxInt;
-
+	gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+	
 	do {
+		textcolor(15);
 		gotoxy(horizontalCenter + 21, 5); cout << "                  ";
 		gotoxy(horizontalCenter + 21, 5); fgets(auxStr, 70, stdin);
 		fflush(stdin);
 		auxArtist = checkArtistByName(auxStr);
+		if (auxArtist.id == -1) {
+			textcolor(4);
+			gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+			gotoxy(endSideBar+28,10); cout << "Esse artista nao existe."; 
+		}
 	} while(auxArtist.id == -1);
 	music.artist = auxArtist;
+	gotoxy(endSideBar + 15, 10); cout << "                                                 ";
 
 	gotoxy(horizontalCenter + 23, 6); cin >> music.duration.mins;
 	do {
+		textcolor(15);
 		gotoxy(horizontalCenter + 26, 6); cout << "    ";
 		gotoxy(horizontalCenter + 26, 6); cin >> music.duration.secs;
 		fflush(stdin);
 		if(music.duration.secs < 0 || music.duration.secs > 59){
-			textcolor(4); textbackground(8);
-			gotoxy(endSideBar+19,8); cout << "A duracao deve estar em formato adequado."; 
+			textcolor(4);
+			gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+			gotoxy(endSideBar+19,10); cout << "A duracao deve estar em formato adequado."; 
 		}
 	} while(music.duration.secs < 0 || music.duration.secs > 59);
+	gotoxy(endSideBar + 15, 10); cout << "                                                 ";
 	fflush(stdin);
 
 	gotoxy(horizontalCenter + 21, 7); fgets(music.title, 70, stdin);
@@ -696,16 +714,19 @@ MUSIC setMusic() {
 	bool flag;
 
 	do {
+		textcolor(15);
 		gotoxy(horizontalCenter + 37, 8); cout << "  /  /     ";
 		gotoxy(horizontalCenter + 37, 8); cin >> music.release.d;
 		gotoxy(horizontalCenter + 40, 8); cin >> music.release.m;
 		gotoxy(horizontalCenter + 43, 8); cin >> music.release.y;
 		flag = isValidDate(music.release.d, music.release.m, music.release.y);
 		if(!flag){
-			textcolor(4); textbackground(8);
-			gotoxy(endSideBar+21,8); cout << "A data deve estar em formato adequado."; 
+			textcolor(4);
+			gotoxy(endSideBar + 15, 10); cout << "                                                 ";
+			gotoxy(endSideBar+21,10); cout << "A data deve estar em formato adequado."; 
 		}
 	} while (!flag);
+	gotoxy(endSideBar + 15, 10); cout << "                                                 ";
 
 	return music;
 }
@@ -728,11 +749,11 @@ void repWriteMusic(){
 		writeMusic(music);
 		
 		textcolor(15); textbackground(8);
-		gotoxy(endSideBar+1, 10); cout << "Deseja cadastrar outro?";
-		gotoxy(endSideBar+2, 11); cout << "Sim";
-		gotoxy(endSideBar+2, 12); cout << "Nao";
+		gotoxy(endSideBar+1, 11); cout << "Deseja cadastrar outro?";
+		gotoxy(endSideBar+2, 12); cout << "Sim";
+		gotoxy(endSideBar+2, 13); cout << "Nao";
 
-		choice = menuSelection(11, 12, options);
+		choice = menuSelection(12, 13, options);
 	}while(choice == 1);
 }
 
@@ -1071,7 +1092,7 @@ void printArtistInputMask(string header, int i){
 void printMusicInputMask(string header, int i){
 	int j, k;
 	textbackground(0); textcolor(15);
-	for(k = i; k<i+9; k++){
+	for(k = i; k<i+10; k++){
 		for(j = endSideBar+1; j<columns-1; j++){
 			gotoxy(j, k); cout << " ";
 		}
