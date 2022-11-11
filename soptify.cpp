@@ -1,3 +1,12 @@
+/*
+	Trabalho: Manipulação de arquivo binário e texto
+	Soptify: cadastro de artistas e músicas
+	
+									Desenvolvido por:
+										Sofia Azevedo Rosa 	221025588
+										Vinicius Casimiro da Silveira 	221026321
+*/
+
 #include<bits/stdc++.h>
 #include <windows.h>
 #include "conio_functions.h"
@@ -57,6 +66,13 @@ void errorOpenFile();
 void printArtistInputMask(string header, int i);
 void printMusicInputMask(string header, int i);
 
+///cripto
+void criptStr(int key, char * phrase);
+char decriptCh(int key, char ch);
+void fileCriptWrite();
+void fileCriptRead();
+void drawHelp();
+
 ///menus
 int mainMenuSelection(int rowMin, int rowMax, char options[][30]);
 int mainMenu();
@@ -110,6 +126,9 @@ int main(){
 	file = fopen(musicsFile, "a+b");
 	fclose(file);
 	//
+
+	//create the encripted help file
+	fileCriptWrite();
 	
 	int choice = 0;
 	
@@ -143,6 +162,12 @@ int main(){
 					break;
 				case 2: 
 					menuMusicExecute();
+					break;
+				case f1: case 4:
+					drawHelp();
+					choice = 0;
+					// gotoxy(columns-10, lines-1);
+					// cout << "F1!";
 					break;
 			}
 		}
@@ -843,6 +868,93 @@ bool checkMusicId(int id) {
 	return flag;
 }
 
+//cripto
+
+char decriptCh(int key, char ch){
+    const int start = 65, end = 122;
+    char chCript;
+
+    if(ch < start || ch > end) return ch;
+    chCript = ch - key;
+    if(chCript < start) chCript = chCript + end - start + 1;
+
+    return chCript;
+}
+
+void criptStr(int key, char * phrase){
+    const int start = 65, end = 122;
+    
+    int size = strlen(phrase);
+    char cript[size+1] = "", aux;
+
+    for (int i = 0; i < strlen(phrase); i++)
+    {   
+        aux = phrase[i];
+        if(aux < start || aux > end) {
+            strncat(cript, &aux, 1);
+            continue;
+        }
+        aux += key;
+        if(aux > end) aux = aux - end + start - 1;
+        strncat(cript, &aux, 1);
+    }
+
+    strcpy(phrase, cript);
+}
+
+void fileCriptWrite(){
+    FILE * file = fopen("./files/help.txt", "wt");
+    char text[13][1000] = 
+    {"Soptify: Ajuda\n\n", 
+    "1) Navegue nos menus utilizando as setas do teclado (cima e baixo)\n",
+    "2) Em qualquer menu, para voltar ou sair, pressione <ESC>\n", 
+    "3) Se quiser acessar a ajuda novamente, pressione <F1>\n\n", 
+    "Sobre o cadastro de Artistas: \n", 
+    "1) O ID do artista deve ser numerico\n", 
+    "2) Um ID se refere apenas a um artista\n\n",
+    "Sobre o cadastro de Musicas:\n",
+    "1) Os mesmos requisitos do ID de artista devem ser atendidos no ID de musica\n",
+    "2) As musicas sao dependentes dos artistas\n", 
+    "\t2.a) O cadastro de musica depende do cadastro de um artista\n", 
+    "\t2.b) Quando um artista eh deletado, suas musicas tambem sao",
+    "\n\n\n\t\t\tDesenvolvedores:\n\t\t\t\tSofia Azevedo Rosa\t22102558\n\t\t\t\tVinicius Casimiro da Silveira\t221026321\n"};
+
+    for(int i=0; i<13;i++){
+        criptStr(3, text[i]);
+        fputs(text[i], file);
+    }
+
+    fclose(file);
+}
+
+void fileCriptRead(int c, int l){
+	bool flagEnter = true;
+
+    FILE * file = fopen("./files/help.txt", "rt");
+    char ch;
+    if(!file){
+        cout << "Error" << endl;
+        return;
+    }
+
+    while (!feof(file)) {
+        ch = getc(file);
+		if(flagEnter){
+			gotoxy(c, l++);
+			flagEnter = false;
+		}
+		if(ch == '\n') flagEnter = true;
+        printf ("%c",decriptCh(3, ch));
+    };
+}
+
+void drawHelp(){
+	int c = endSideBar + 2, l = 2;
+	clearMenuArea();
+	fileCriptRead(c, l);
+	getch();
+}
+
 //menus
 int mainMenuSelection(int rowMin, int rowMax, char options[][30]){
 	cursor(0);
@@ -872,6 +984,9 @@ int mainMenuSelection(int rowMin, int rowMax, char options[][30]){
             case esc:
             	choice = -1;
             	break;
+			case f1:
+				choice = f1;
+				break;
 		}
 		
 		gotoxy(3,aux);
@@ -924,6 +1039,9 @@ int menuSelection(int rowMin, int rowMax, char options[][30]){
             case esc:
             	choice = -1;
             	break;
+			case f1:
+				choice = f1;
+				break;
 		}
 		
 		gotoxy(endSideBar + 2,aux);
@@ -946,7 +1064,9 @@ void menuMusicExecute(){
 				readMusics(1);
 				getch();
 				break;
-			case 3:
+			case f1: case 3:
+				drawHelp();
+				choice = 0;
 				break;
 		}
 	}
@@ -990,6 +1110,10 @@ void menuArtistExecute(){
 				break;
 			case 4:
 				repDeleteArtist();
+				break;
+			case f1: case 5:
+				drawHelp();
+				choice = 0;
 				break;
 		}
 	}
