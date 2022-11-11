@@ -939,6 +939,7 @@ void fileCriptRead(int c, int l){
 
     while (!feof(file)) {
         ch = getc(file);
+		if(ch == EOF) break;
 		if(flagEnter){
 			gotoxy(c, l++);
 			flagEnter = false;
